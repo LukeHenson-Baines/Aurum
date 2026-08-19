@@ -1,0 +1,18 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: aurum-postgres
+
+    environment:
+      POSTGRES_DB: aurum
+      POSTGRES_USER: aurum
+      POSTGRES_PASSWORD: aurum
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - aurum-postgres-data:/var/lib/postgresql/data
+
+volumes:
+  aurum-postgres-data:
