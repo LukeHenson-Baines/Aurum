@@ -2,6 +2,7 @@ package com.aurum.service;
 
 import com.aurum.dto.PortfolioRequest;
 import com.aurum.dto.PortfolioResponse;
+import com.aurum.exception.PortfolioNotFoundException;
 import com.aurum.model.Portfolio;
 import com.aurum.repository.PortfolioRepository;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,13 @@ public class PortfolioService {
         return toResponse(savedPortfolio);
     }
 
+    public PortfolioResponse getPortfolioById(Long id) {
+        Portfolio portfolio = portfolioRepository.findById(id)
+            .orElseThrow(() -> new PortfolioNotFoundException(id));
+
+        return toResponse(portfolio);
+    }
+
     public List<PortfolioResponse> getAllPortfolios() {
         return portfolioRepository.findAll()
                 .stream()
@@ -38,5 +46,23 @@ public class PortfolioService {
                 portfolio.getName(),
                 portfolio.getCreatedAt()
         );
+    }
+
+    public PortfolioResponse updatePortfolio(Long id, PortfolioRequest request) {
+        Portfolio portfolio = portfolioRepository.findById(id)
+                .orElseThrow(() -> new PortfolioNotFoundException(id));
+
+        portfolio.setName(request.getName());
+
+        Portfolio updatedPortfolio = portfolioRepository.save(portfolio);
+
+        return toResponse(updatedPortfolio);
+    }
+
+    public void deletePortfolio(Long id) {
+        Portfolio portfolio = portfolioRepository.findById(id)
+                .orElseThrow(() -> new PortfolioNotFoundException(id));
+
+        portfolioRepository.delete(portfolio);
     }
 }

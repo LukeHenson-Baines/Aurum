@@ -31,4 +31,23 @@ public class PortfolioController {
     public List<PortfolioResponse> getAllPortfolios() {
         return portfolioService.getAllPortfolios();
     }
+
+    @GetMapping("/{id}")
+    public PortfolioResponse getPortfolioById(@PathVariable Long id) {
+        return portfolioService.getPortfolioById(id);
+    }
+
+    @PutMapping("/{id}")
+    public PortfolioResponse updatePortfolio(
+        @PathVariable Long id,
+        @Valid @RequestBody PortfolioRequest request) {
+
+    return portfolioService.updatePortfolio(id, request);
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deletePortfolio(@PathVariable Long id) {
+        portfolioService.deletePortfolio(id);
+    }
 }
