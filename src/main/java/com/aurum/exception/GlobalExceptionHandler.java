@@ -55,4 +55,36 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.BAD_REQUEST)
                 .body(body);
     }
+
+    @ExceptionHandler(AssetNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleAssetNotFound(
+            AssetNotFoundException exception) {
+
+        Map<String, Object> body = Map.of(
+                "timestamp", LocalDateTime.now(),
+                "status", HttpStatus.NOT_FOUND.value(),
+                "error", "Not Found",
+                "message", exception.getMessage()
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(body);
+    }
+
+    @ExceptionHandler(DuplicateAssetSymbolException.class)
+    public ResponseEntity<Map<String, Object>> handleDuplicateAssetSymbol(
+            DuplicateAssetSymbolException exception) {
+
+        Map<String, Object> body = Map.of(
+                "timestamp", LocalDateTime.now(),
+                "status", HttpStatus.CONFLICT.value(),
+                "error", "Conflict",
+                "message", exception.getMessage()
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(body);
+    }
 }
