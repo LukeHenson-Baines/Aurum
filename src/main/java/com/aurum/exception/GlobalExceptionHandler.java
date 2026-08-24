@@ -87,4 +87,20 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.CONFLICT)
                 .body(body);
     }
+
+    @ExceptionHandler(InsufficientHoldingsException.class)
+        public ResponseEntity<Map<String, Object>> handleInsufficientHoldings(
+                InsufficientHoldingsException exception) {
+
+        Map<String, Object> body = Map.of(
+                "timestamp", LocalDateTime.now(),
+                "status", HttpStatus.CONFLICT.value(),
+                "error", "Conflict",
+                "message", exception.getMessage()
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(body);
+    }
 }
