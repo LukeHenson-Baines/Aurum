@@ -66,3 +66,43 @@ export async function getAssets() {
 
   return response.json()
 }
+
+export async function createAsset(asset) {
+  const response = await fetch(`${API_BASE_URL}/assets`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(asset),
+  })
+
+  if (!response.ok) {
+    const errorBody = await response.json().catch(() => null)
+
+    throw new Error(
+      errorBody?.message ?? 'Failed to create asset'
+    )
+  }
+
+  return response.json()
+}
+
+export async function createPortfolio(portfolio) {
+  const response = await fetch(`${API_BASE_URL}/portfolios`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(portfolio),
+  })
+
+  if (!response.ok) {
+    const errorBody = await response.json().catch(() => null)
+
+    throw new Error(
+      errorBody?.message ?? 'Failed to create portfolio'
+    )
+  }
+
+  return response.json()
+}

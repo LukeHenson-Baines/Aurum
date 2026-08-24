@@ -261,3 +261,74 @@ button {
     grid-template-columns: 1fr;
   }
 }
+
+.header-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.asset-form {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr auto;
+  gap: 16px;
+  padding: 22px;
+}
+
+.asset-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  color: #475467;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.asset-form input {
+  padding: 10px 11px;
+  border: 1px solid #d0d5dd;
+  border-radius: 7px;
+}
+
+.asset-form .primary-button {
+  align-self: end;
+}
+
+@media (max-width: 750px) {
+  .asset-form {
+    grid-template-columns: 1fr;
+  }
+
+  .header-actions {
+    flex-wrap: wrap;
+  }
+}
+
+.portfolio-form {
+  display: flex;
+  align-items: end;
+  gap: 16px;
+  padding: 22px;
+}
+
+.portfolio-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  flex: 1;
+  color: #475467;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.portfolio-form input {
+  padding: 10px 11px;
+  border: 1px solid #d0d5dd;
+  border-radius: 7px;
+}
+
+@media (max-width: 550px) {
+  .portfolio-form {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}

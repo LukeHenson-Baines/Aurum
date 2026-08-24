@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import './App.css'
 
 import {
+  createAsset,
+  createPortfolio,
   createTransaction,
   getAssets,
   getPortfolios,
@@ -25,6 +27,20 @@ function App() {
     quantity: '',
     price: '',
     transactionDate: new Date().toISOString().split('T')[0],
+  })
+
+  const [showAssetForm, setShowAssetForm] = useState(false)
+
+  const [assetForm, setAssetForm] = useState({
+    symbol: '',
+    name: '',
+    currentPrice: '',
+  })
+
+  const [showPortfolioForm, setShowPortfolioForm] = useState(false)
+
+  const [portfolioForm, setPortfolioForm] = useState({
+    name: '',
   })
 
   useEffect(() => {
@@ -82,6 +98,37 @@ function App() {
     setHoldings(holdingsData)
   }
 
+  function handlePortfolioChange(event) {
+    setPortfolioForm({
+      name: event.target.value,
+    })
+  }
+
+  async function handlePortfolioSubmit(event) {
+    event.preventDefault()
+
+    try {
+      setError(null)
+
+      const newPortfolio = await createPortfolio({
+        name: portfolioForm.name,
+      })
+
+      const updatedPortfolios = await getPortfolios()
+
+      setPortfolios(updatedPortfolios)
+      setSelectedPortfolioId(newPortfolio.id)
+
+      setPortfolioForm({
+        name: '',
+      })
+
+      setShowPortfolioForm(false)
+    } catch (err) {
+      setError(err.message)
+    }
+  }
+
   function formatCurrency(value) {
     return new Intl.NumberFormat('en-GB', {
       style: 'currency',
@@ -132,6 +179,42 @@ function App() {
     }
   }
 
+  function handleAssetChange(event) {
+    const { name, value } = event.target
+
+    setAssetForm((current) => ({
+      ...current,
+      [name]: value,
+    }))
+  }
+
+  async function handleAssetSubmit(event) {
+    event.preventDefault()
+
+    try {
+      setError(null)
+
+      await createAsset({
+        symbol: assetForm.symbol.toUpperCase(),
+        name: assetForm.name,
+        currentPrice: Number(assetForm.currentPrice),
+      })
+
+      const updatedAssets = await getAssets()
+      setAssets(updatedAssets)
+
+      setAssetForm({
+        symbol: '',
+        name: '',
+        currentPrice: '',
+      })
+
+      setShowAssetForm(false)
+    } catch (err) {
+      setError(err.message)
+    }
+  }
+
   if (loading && portfolios.length === 0) {
     return <div className="status-screen">Loading Aurum...</div>
   }
@@ -175,12 +258,28 @@ function App() {
             )}
           </div>
 
-          <button
-            className="primary-button"
-            onClick={() => setShowTransactionForm(true)}
-          >
-            Add Transaction
-          </button>
+          <div className="header-actions">
+            <button
+              className="secondary-button"
+              onClick={() => setShowPortfolioForm(true)}
+            >
+              Add Portfolio
+            </button>
+
+            <button
+              className="secondary-button"
+              onClick={() => setShowAssetForm(true)}
+            >
+              Add Asset
+            </button>
+
+            <button
+              className="primary-button"
+              onClick={() => setShowTransactionForm(true)}
+            >
+              Add Transaction
+            </button>
+          </div>
 
         </section>
 
@@ -188,6 +287,110 @@ function App() {
           <div className="error-banner">
             {error}
           </div>
+        )}
+
+        {showPortfolioForm && (
+          <section className="transaction-panel">
+            <div className="panel-header transaction-header">
+              <h3>Add Portfolio</h3>
+
+              <button
+                className="secondary-button"
+                onClick={() => setShowPortfolioForm(false)}
+              >
+                Cancel
+              </button>
+            </div>
+
+            <form
+              className="portfolio-form"
+              onSubmit={handlePortfolioSubmit}
+            >
+              <label>
+                Portfolio Name
+                <input
+                  name="name"
+                  type="text"
+                  placeholder="Growth Portfolio"
+                  value={portfolioForm.name}
+                  onChange={handlePortfolioChange}
+                  required
+                />
+              </label>
+
+              <button
+                className="primary-button"
+                type="submit"
+              >
+                Create Portfolio
+              </button>
+            </form>
+          </section>
+        )}
+
+        {showAssetForm && (
+          <section className="transaction-panel">
+            <div className="panel-header transaction-header">
+              <h3>Add Asset</h3>
+
+              <button
+                className="secondary-button"
+                onClick={() => setShowAssetForm(false)}
+              >
+                Cancel
+              </button>
+            </div>
+
+            <form
+              className="asset-form"
+              onSubmit={handleAssetSubmit}
+            >
+              <label>
+                Symbol
+                <input
+                  name="symbol"
+                  type="text"
+                  placeholder="AAPL"
+                  value={assetForm.symbol}
+                  onChange={handleAssetChange}
+                  required
+                />
+              </label>
+
+              <label>
+                Name
+                <input
+                  name="name"
+                  type="text"
+                  placeholder="Apple Inc."
+                  value={assetForm.name}
+                  onChange={handleAssetChange}
+                  required
+                />
+              </label>
+
+              <label>
+                Current Price
+                <input
+                  name="currentPrice"
+                  type="number"
+                  min="0"
+                  step="0.0001"
+                  placeholder="225.50"
+                  value={assetForm.currentPrice}
+                  onChange={handleAssetChange}
+                  required
+                />
+              </label>
+
+              <button
+                className="primary-button"
+                type="submit"
+              >
+                Save Asset
+              </button>
+            </form>
+          </section>
         )}
 
         {showTransactionForm && (
