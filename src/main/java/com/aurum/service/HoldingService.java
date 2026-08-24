@@ -31,6 +31,19 @@ public class HoldingService {
     }
 
     public List<HoldingResponse> getHoldings(Long portfolioId) {
+        return calculateHoldings(portfolioId)
+                .stream()
+                .filter(holding ->
+                        holding.getQuantity().compareTo(BigDecimal.ZERO) > 0
+                )
+                .toList();
+    }
+
+    public List<HoldingResponse> getAllCalculatedHoldings(Long portfolioId) {
+        return calculateHoldings(portfolioId);
+    }
+
+    private List<HoldingResponse> calculateHoldings(Long portfolioId) {
 
         if (!portfolioRepository.existsById(portfolioId)) {
             throw new PortfolioNotFoundException(portfolioId);
@@ -63,9 +76,7 @@ public class HoldingService {
         List<HoldingResponse> holdings = new ArrayList<>();
 
         for (HoldingState state : states.values()) {
-            if (state.quantity.compareTo(BigDecimal.ZERO) > 0) {
-                holdings.add(toResponse(state));
-            }
+            holdings.add(toResponse(state));
         }
 
         return holdings;
