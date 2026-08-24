@@ -357,3 +357,60 @@ button {
   background: #fff1f0;
   color: #b42318;
 }
+
+.summary-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.summary-card small {
+  display: block;
+  margin-top: 9px;
+  color: #98a2b3;
+  font-size: 12px;
+}
+
+.positive {
+  color: #067647;
+}
+
+.negative {
+  color: #b42318;
+}
+
+.holdings-table tbody tr:hover {
+  background: #f9fafb;
+}
+
+.holdings-table td:not(:first-child),
+.holdings-table th:not(:first-child) {
+  text-align: right;
+}
+
+.holdings-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.loading-bar {
+  margin-bottom: 18px;
+  padding: 9px 12px;
+  border-radius: 7px;
+  background: #f2f4f7;
+  color: #667085;
+  font-size: 13px;
+}
+
+.empty-state strong {
+  display: block;
+  margin-bottom: 6px;
+  color: #344054;
+}
+
+.empty-state span {
+  font-size: 13px;
+}
+
+.empty-state strong,
+.empty-state span {
+  display: block;
+}

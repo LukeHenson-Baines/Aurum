@@ -236,6 +236,36 @@ function App() {
     }).format(new Date(`${value}T00:00:00`))
   }
 
+  function valueClass(value) {
+    const numericValue = Number(value ?? 0)
+
+    if (numericValue > 0) {
+      return 'positive'
+    }
+
+    if (numericValue < 0) {
+      return 'negative'
+    }
+
+    return ''
+  }
+
+  function signedCurrency(value) {
+    const numericValue = Number(value ?? 0)
+
+    const formatted = formatCurrency(Math.abs(numericValue))
+
+    if (numericValue > 0) {
+      return `+${formatted}`
+    }
+
+    if (numericValue < 0) {
+      return `-${formatted}`
+    }
+
+    return formatted
+  }
+
   if (loading && portfolios.length === 0) {
     return <div className="status-screen">Loading Aurum...</div>
   }
@@ -303,6 +333,12 @@ function App() {
           </div>
 
         </section>
+
+        {loading && portfolios.length > 0 && (
+          <div className="loading-bar">
+            Updating portfolio...
+          </div>
+        )}
 
         {error && (
           <div className="error-banner">
@@ -514,25 +550,50 @@ function App() {
             <strong>
               {formatCurrency(summary?.totalMarketValue)}
             </strong>
+
+            <small>
+              Cost basis {formatCurrency(summary?.totalCostBasis)}
+            </small>
           </div>
 
           <div className="summary-card">
             <span>Total P&amp;L</span>
-            <strong>
-              {formatCurrency(summary?.totalProfitLoss)}
+
+            <strong className={valueClass(summary?.totalProfitLoss)}>
+              {signedCurrency(summary?.totalProfitLoss)}
             </strong>
+
+            <small>
+              Realised{' '}
+              <span className={valueClass(summary?.totalRealisedProfitLoss)}>
+                {signedCurrency(summary?.totalRealisedProfitLoss)}
+              </span>
+            </small>
           </div>
 
           <div className="summary-card">
             <span>Return</span>
-            <strong>
+
+            <strong className={valueClass(summary?.returnPercentage)}>
+              {Number(summary?.returnPercentage ?? 0) > 0 ? '+' : ''}
               {formatPercentage(summary?.returnPercentage)}
             </strong>
+
+            <small>
+              Unrealised{' '}
+              <span className={valueClass(summary?.totalUnrealisedProfitLoss)}>
+                {signedCurrency(summary?.totalUnrealisedProfitLoss)}
+              </span>
+            </small>
           </div>
 
           <div className="summary-card">
-            <span>Holdings</span>
+            <span>Positions</span>
             <strong>{holdings.length}</strong>
+
+            <small>
+              Active holdings
+            </small>
           </div>
         </section>
 
@@ -543,7 +604,10 @@ function App() {
 
           {holdings.length === 0 ? (
             <div className="empty-state">
-              No holdings to display.
+              <strong>No holdings yet</strong>
+              <span>
+                Add a BUY transaction to start tracking this portfolio.
+              </span>
             </div>
           ) : (
             <div className="table-wrapper">
@@ -556,6 +620,7 @@ function App() {
                     <th>Current Price</th>
                     <th>Market Value</th>
                     <th>Unrealised P&amp;L</th>
+                    <th>Realised P&amp;L</th>
                   </tr>
                 </thead>
 
@@ -583,9 +648,23 @@ function App() {
                         {formatCurrency(holding.marketValue)}
                       </td>
 
-                      <td>
-                        {formatCurrency(
+                      <td
+                        className={valueClass(
                           holding.unrealisedProfitLoss
+                        )}
+                      >
+                        {signedCurrency(
+                          holding.unrealisedProfitLoss
+                        )}
+                      </td>
+
+                      <td
+                        className={valueClass(
+                          holding.realisedProfitLoss
+                        )}
+                      >
+                        {signedCurrency(
+                          holding.realisedProfitLoss
                         )}
                       </td>
                     </tr>
