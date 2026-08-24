@@ -106,3 +106,15 @@ export async function createPortfolio(portfolio) {
 
   return response.json()
 }
+
+export async function getPortfolioTransactions(portfolioId) {
+  const response = await fetch(
+    `${API_BASE_URL}/portfolios/${portfolioId}/transactions`
+  )
+
+  if (!response.ok) {
+    throw new Error('Failed to load portfolio transactions')
+  }
+
+  return response.json()
+}

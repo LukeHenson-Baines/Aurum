@@ -332,3 +332,28 @@ button {
     flex-direction: column;
   }
 }
+
+.transaction-history-panel {
+  margin-top: 28px;
+}
+
+.transaction-type {
+  display: inline-block;
+  min-width: 48px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+}
+
+.transaction-buy {
+  background: #ecfdf3;
+  color: #027a48;
+}
+
+.transaction-sell {
+  background: #fff1f0;
+  color: #b42318;
+}

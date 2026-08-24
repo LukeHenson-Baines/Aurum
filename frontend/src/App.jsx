@@ -9,6 +9,7 @@ import {
   getPortfolios,
   getPortfolioSummary,
   getPortfolioHoldings,
+  getPortfolioTransactions,
 } from './api/aurumApi'
 
 function App() {
@@ -42,6 +43,8 @@ function App() {
   const [portfolioForm, setPortfolioForm] = useState({
     name: '',
   })
+
+  const [transactions, setTransactions] = useState([])
 
   useEffect(() => {
     async function loadInitialData() {
@@ -89,13 +92,19 @@ function App() {
   }, [selectedPortfolioId])
 
   async function refreshPortfolioData(portfolioId) {
-    const [summaryData, holdingsData] = await Promise.all([
+    const [
+      summaryData,
+      holdingsData,
+      transactionData,
+    ] = await Promise.all([
       getPortfolioSummary(portfolioId),
       getPortfolioHoldings(portfolioId),
+      getPortfolioTransactions(portfolioId),
     ])
 
     setSummary(summaryData)
     setHoldings(holdingsData)
+    setTransactions(transactionData)
   }
 
   function handlePortfolioChange(event) {
@@ -213,6 +222,18 @@ function App() {
     } catch (err) {
       setError(err.message)
     }
+  }
+
+  function formatDate(value) {
+    if (!value) {
+      return ''
+    }
+
+    return new Intl.DateTimeFormat('en-GB', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    }).format(new Date(`${value}T00:00:00`))
   }
 
   if (loading && portfolios.length === 0) {
@@ -569,6 +590,75 @@ function App() {
                       </td>
                     </tr>
                   ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </section>
+        <section className="panel transaction-history-panel">
+          <div className="panel-header">
+            <h3>Transaction History</h3>
+          </div>
+
+          {transactions.length === 0 ? (
+            <div className="empty-state">
+              No transactions to display.
+            </div>
+          ) : (
+            <div className="table-wrapper">
+              <table className="holdings-table">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Asset</th>
+                    <th>Type</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th>Total</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {[...transactions]
+                    .reverse()
+                    .map((transaction) => (
+                      <tr key={transaction.id}>
+                        <td>
+                          {formatDate(transaction.transactionDate)}
+                        </td>
+
+                        <td>
+                          <strong>{transaction.assetSymbol}</strong>
+                        </td>
+
+                        <td>
+                          <span
+                            className={`transaction-type ${
+                              transaction.type === 'BUY'
+                                ? 'transaction-buy'
+                                : 'transaction-sell'
+                            }`}
+                          >
+                            {transaction.type}
+                          </span>
+                        </td>
+
+                        <td>
+                          {Number(transaction.quantity)}
+                        </td>
+
+                        <td>
+                          {formatCurrency(transaction.price)}
+                        </td>
+
+                        <td>
+                          {formatCurrency(
+                            Number(transaction.quantity) *
+                              Number(transaction.price)
+                          )}
+                        </td>
+                      </tr>
+                    ))}
                 </tbody>
               </table>
             </div>
