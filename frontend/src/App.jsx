@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import './App.css'
 
 import {
+  createTransaction,
+  getAssets,
   getPortfolios,
   getPortfolioSummary,
   getPortfolioHoldings,
@@ -14,16 +16,30 @@ function App() {
   const [holdings, setHoldings] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [assets, setAssets] = useState([])
+  const [showTransactionForm, setShowTransactionForm] = useState(false)
+
+  const [transactionForm, setTransactionForm] = useState({
+    assetId: '',
+    type: 'BUY',
+    quantity: '',
+    price: '',
+    transactionDate: new Date().toISOString().split('T')[0],
+  })
 
   useEffect(() => {
-    async function loadPortfolios() {
+    async function loadInitialData() {
       try {
-        const data = await getPortfolios()
+        const [portfolioData, assetData] = await Promise.all([
+          getPortfolios(),
+          getAssets(),
+        ])
 
-        setPortfolios(data)
+        setPortfolios(portfolioData)
+        setAssets(assetData)
 
-        if (data.length > 0) {
-          setSelectedPortfolioId(data[0].id)
+        if (portfolioData.length > 0) {
+          setSelectedPortfolioId(portfolioData[0].id)
         }
       } catch (err) {
         setError(err.message)
@@ -32,7 +48,7 @@ function App() {
       }
     }
 
-    loadPortfolios()
+    loadInitialData()
   }, [])
 
   useEffect(() => {
@@ -45,13 +61,7 @@ function App() {
         setLoading(true)
         setError(null)
 
-        const [summaryData, holdingsData] = await Promise.all([
-          getPortfolioSummary(selectedPortfolioId),
-          getPortfolioHoldings(selectedPortfolioId),
-        ])
-
-        setSummary(summaryData)
-        setHoldings(holdingsData)
+        await refreshPortfolioData(selectedPortfolioId)
       } catch (err) {
         setError(err.message)
       } finally {
@@ -62,6 +72,16 @@ function App() {
     loadPortfolioData()
   }, [selectedPortfolioId])
 
+  async function refreshPortfolioData(portfolioId) {
+    const [summaryData, holdingsData] = await Promise.all([
+      getPortfolioSummary(portfolioId),
+      getPortfolioHoldings(portfolioId),
+    ])
+
+    setSummary(summaryData)
+    setHoldings(holdingsData)
+  }
+
   function formatCurrency(value) {
     return new Intl.NumberFormat('en-GB', {
       style: 'currency',
@@ -71,6 +91,45 @@ function App() {
 
   function formatPercentage(value) {
     return `${Number(value ?? 0).toFixed(2)}%`
+  }
+
+  function handleTransactionChange(event) {
+    const { name, value } = event.target
+
+    setTransactionForm((current) => ({
+      ...current,
+      [name]: value,
+    }))
+  }
+
+  async function handleTransactionSubmit(event) {
+    event.preventDefault()
+
+    try {
+      setError(null)
+
+      await createTransaction(selectedPortfolioId, {
+        assetId: Number(transactionForm.assetId),
+        type: transactionForm.type,
+        quantity: Number(transactionForm.quantity),
+        price: Number(transactionForm.price),
+        transactionDate: transactionForm.transactionDate,
+      })
+
+      await refreshPortfolioData(selectedPortfolioId)
+
+      setTransactionForm({
+        assetId: '',
+        type: 'BUY',
+        quantity: '',
+        price: '',
+        transactionDate: new Date().toISOString().split('T')[0],
+      })
+
+      setShowTransactionForm(false)
+    } catch (err) {
+      setError(err.message)
+    }
   }
 
   if (loading && portfolios.length === 0) {
@@ -116,15 +175,113 @@ function App() {
             )}
           </div>
 
-          <button className="primary-button">
+          <button
+            className="primary-button"
+            onClick={() => setShowTransactionForm(true)}
+          >
             Add Transaction
           </button>
+
         </section>
 
         {error && (
           <div className="error-banner">
             {error}
           </div>
+        )}
+
+        {showTransactionForm && (
+          <section className="transaction-panel">
+            <div className="panel-header transaction-header">
+              <h3>Add Transaction</h3>
+
+              <button
+                className="secondary-button"
+                onClick={() => setShowTransactionForm(false)}
+              >
+                Cancel
+              </button>
+            </div>
+
+            <form
+              className="transaction-form"
+              onSubmit={handleTransactionSubmit}
+            >
+              <label>
+                Asset
+                <select
+                  name="assetId"
+                  value={transactionForm.assetId}
+                  onChange={handleTransactionChange}
+                  required
+                >
+                  <option value="">Select asset</option>
+
+                  {assets.map((asset) => (
+                    <option key={asset.id} value={asset.id}>
+                      {asset.symbol} — {asset.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <label>
+                Type
+                <select
+                  name="type"
+                  value={transactionForm.type}
+                  onChange={handleTransactionChange}
+                >
+                  <option value="BUY">Buy</option>
+                  <option value="SELL">Sell</option>
+                </select>
+              </label>
+
+              <label>
+                Quantity
+                <input
+                  name="quantity"
+                  type="number"
+                  min="0"
+                  step="0.00000001"
+                  value={transactionForm.quantity}
+                  onChange={handleTransactionChange}
+                  required
+                />
+              </label>
+
+              <label>
+                Price
+                <input
+                  name="price"
+                  type="number"
+                  min="0"
+                  step="0.0001"
+                  value={transactionForm.price}
+                  onChange={handleTransactionChange}
+                  required
+                />
+              </label>
+
+              <label>
+                Date
+                <input
+                  name="transactionDate"
+                  type="date"
+                  value={transactionForm.transactionDate}
+                  onChange={handleTransactionChange}
+                  required
+                />
+              </label>
+
+              <button
+                className="primary-button"
+                type="submit"
+              >
+                Save Transaction
+              </button>
+            </form>
+          </section>
         )}
 
         <section className="summary-grid">

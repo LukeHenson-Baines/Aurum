@@ -200,3 +200,64 @@ button {
 .status-screen.error {
   color: #912018;
 }
+
+.transaction-panel {
+  background: white;
+  border: 1px solid #e4e7ec;
+  border-radius: 10px;
+  margin-bottom: 28px;
+}
+
+.transaction-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.transaction-form {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 16px;
+  padding: 22px;
+}
+
+.transaction-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  color: #475467;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.transaction-form input,
+.transaction-form select {
+  padding: 10px 11px;
+  border: 1px solid #d0d5dd;
+  border-radius: 7px;
+  background: white;
+}
+
+.transaction-form .primary-button {
+  align-self: end;
+}
+
+.secondary-button {
+  border: 1px solid #d0d5dd;
+  border-radius: 7px;
+  padding: 8px 14px;
+  background: white;
+  cursor: pointer;
+}
+
+@media (max-width: 900px) {
+  .transaction-form {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 550px) {
+  .transaction-form {
+    grid-template-columns: 1fr;
+  }
+}

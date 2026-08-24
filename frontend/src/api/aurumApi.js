@@ -33,3 +33,36 @@ export async function getPortfolioHoldings(portfolioId) {
 
   return response.json()
 }
+
+export async function createTransaction(portfolioId, transaction) {
+  const response = await fetch(
+    `${API_BASE_URL}/portfolios/${portfolioId}/transactions`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(transaction),
+    }
+  )
+
+  if (!response.ok) {
+    const errorBody = await response.json().catch(() => null)
+
+    throw new Error(
+      errorBody?.message ?? 'Failed to create transaction'
+    )
+  }
+
+  return response.json()
+}
+
+export async function getAssets() {
+  const response = await fetch(`${API_BASE_URL}/assets`)
+
+  if (!response.ok) {
+    throw new Error('Failed to load assets')
+  }
+
+  return response.json()
+}
