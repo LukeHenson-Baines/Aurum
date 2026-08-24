@@ -77,7 +77,7 @@ public class TransactionService {
         }
 
         return transactionRepository
-                .findByPortfolioIdOrderByTransactionDateAsc(portfolioId)
+                .findByPortfolioIdOrderByTransactionDateAscIdAsc(portfolioId)
                 .stream()
                 .map(this::toResponse)
                 .toList();

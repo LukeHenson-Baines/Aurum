@@ -25,6 +25,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -256,7 +257,7 @@ class TransactionServiceTest {
                 .thenReturn(true);
 
         when(transactionRepository
-                .findByPortfolioIdOrderByTransactionDateAsc(1L))
+                .findByPortfolioIdOrderByTransactionDateAscIdAsc(1L))
                 .thenReturn(List.of(transaction));
 
         List<TransactionResponse> responses =
