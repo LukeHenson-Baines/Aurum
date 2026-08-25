@@ -1,0 +1,7 @@
+target
+frontend
+.git
+.github
+.vscode
+.idea
+*.log
